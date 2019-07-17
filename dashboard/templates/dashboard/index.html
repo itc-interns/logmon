@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"></script>
+     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
+    <!-- Map -->
+    <!-- <link rel="stylesheet" type="text/css" href="http://cdn.leafletjs.com/leaflet/v1.0.0-rc.1/leaflet.css"> -->
+    <!-- <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet/v1.0.0-rc.1/leaflet-src.js"></script> -->
+    <!-- <script type="text/javascript" src="https://leaflet.github.io/Leaflet.markercluster/example/realworld.10000.js"></script> -->
+    <!-- <script type="text/javascript" src="http://pvb.io/js/heatmap.js"></script> -->
+    <!-- <script type="text/javascript" src="http://pvb.io/js/leaflet-heatmap.js"></script> -->
+    <!--  -->
+    {% load static %}
+    <script src="{% static "dashboard/js/liquidFillGauge.js" %}" type="text/javascript"></script>
+    <script src="{% static "dashboard/js/leaflet-src.js" %}" type="text/javascript"></script>
+    <script src="{% static "dashboard/js/realworld.10000.js" %}" type="text/javascript"></script>
+    <script src="{% static "dashboard/js/heatmap.js" %}" type="text/javascript"></script>
+    <script src="{% static "dashboard/js/leaflet-heatmap.js" %}" type="text/javascript"></script>
+
+
+
+
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static "dashboard/css/main.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "dashboard/css/leaflet.css" %}">
+
+
+    <title>Dashboard</title>
+</head>
+<body onload="startLoader();">
+<style>
+  body { padding-top: 85px; }
+  .lgi{
+    cursor :pointer;
+  }
+
+</style>
+
+<!-- Navbar -->
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Dashboard</a>
+  <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button> -->  
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <span style="color:#ffc31f;">Source = {{ pathToFolder }}</span>
+      </li>        
+    </ul>
+  </div>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <div class="input-group mb-3">
+              {% comment %} <input type="text" class="form-control date" placeholder="Pick Dates" data-provide="datepicker">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">View</button>
+          </div> {% endcomment %}
+          <div class="input-group-append">
+          <a class="btn btn-outline-secondary" href="./threats">Threats</a>
+          <a class="btn btn-outline-secondary" href="./viewerror">View All Errors</a>
+          <a class="btn btn-outline-secondary" href="./viewall">View All</a>
+        </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!-- Navbar -->
+    <div id="loader"></div>
+
+    <div id="pageBody" style="display: none;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-3">
+            <div style="position: fixed; width:25%;" >
+              <div class="list-group">
+                <li class="list-group-item lgi head-text" style="font-weight:600;" data-toggle="collapse" href="#status_code_count_content" role="button" aria-expanded="true" aria-controls="status_code_count_content">
+                  Status Codes                        
+                </li>
+                <span class="collapse" id="status_code_count_content">
+                </span>
+              </div>
+              <ul class="list-group">
+                <li class="list-group-item lgi head-text" style="font-weight:600;" data-toggle="collapse" href="#Hits_counts" aria-expanded="false" aria-controls="Hits_counts">Hit Count</li>
+                <span id="Hits_counts" class="collapse">
+                <li class="list-group-item lgi">Today
+                  <span class="badge badge-light float-right" id="hitcountToday"></span>
+                </li>
+                <li class="list-group-item lgi">This Month
+                  <span class="badge badge-light float-right" id="hitcountThisMonth"></span>
+                </li>
+                <li class="list-group-item lgi">Overall
+                  <span class="badge badge-light float-right" id="hitcountOverall"></span>
+                </li>
+              </ul>
+              <ul class="list-group">
+                <li class="list-group-item lgi head-text" style="font-weight:600;" data-toggle="collapse" href="#Users" aria-expanded="false" aria-controls="Users">Users</li>
+                <span id="Users" class="collapse">
+                  <li class="list-group-item lgi" style="font-weight:600;" data-toggle="modal" data-target="#auth_users2" >Authorized IPs</li>
+                  <li class="list-group-item lgi" style="font-weight:600;" data-toggle="modal" data-target="#auth_users" >Unauthorized IPs</li>
+                </span>
+                <li class="list-group-item lgi head-text" style="font-weight:600;" data-toggle="modal" data-target="#unique_endpoints" >API Hits</li>
+                <li class="list-group-item lgi head-text" style="font-weight:600;" data-toggle="collapse" href="#bots" aria-expanded="false" aria-controls="bots">
+                      Bots
+                  <span class="badge badge-light float-right" id="botCount"></span>
+                </li>
+                <span class="collapse" id="bots">
+                </span>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <div class="row" >
+              <div class="card col-11 container" style="padding-bottom: 15px" > 
+                  <h4 class="text-center" style="margin-top: px;width:100%;color:#ffab00"><span style="color:green;" >Success</span>, <span style="color:red;" >errors</span> and <span style="color:blue;" >Server-errors</span> Percentage</h4>
+              <div class="row text-center" style="margin-top: 15px;">
+                  <div class="col-2"></div>
+                  <div class="col">
+                    <svg style="cursor: pointer" data-toggle="tooltip" onclick="downloadStatusCodeCsv(1);" data-placement="bottom" data-html="true" title="StatusCode 200" id="fillgauge1" width="100%" height="100px"></svg>
+                  </div>
+                  <div class="col">
+                    <svg style="cursor: pointer" data-toggle="tooltip" onclick="downloadStatusCodeCsv(2);" data-placement="bottom" data-html="true" title="StatusCode 404" id="fillgauge2" width="100%" height="100px"></svg>
+                  </div>
+                  <div style="cursor: pointer" class="col">
+                    <svg data-toggle="tooltip" onclick="downloadStatusCodeCsv(3);" data-placement="bottom" data-html="true" id="fillgauge3" width="100%" height="100px"></svg>
+                  </div>
+                  <div class="col-1"></div>
+              </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="card col-11 container" style="margin-top: 15px;padding-bottom: 15px;">
+                <div class="card-title text-center mb-0">Hits-Location Map<i class="fa fa-search" style="color:deepskyblue;margin-left:50px;cursor:pointer;" onclick="find();"></i>
+                </div>
+                <input placeholder="Enter the IP" type="text" class="loc" id="location" name="location" style="height:23px !important;text-align:center;" onkeypress="locate(event);">
+                <span id="ans" style="font-size:14px;text-align:center;"></span>
+                <div class="row" id="map">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="card col-11 container" style="margin-top: 15px;">
+                  <div class="card-title text-center mb-0">Hits based Graph</div>
+                  <div class="card-body">
+                    <div id="lineGraphDiv">
+                      {% comment %} 
+                      <canvas id="lineGraphForHits">
+                        <!-- Space for the line graph -->
+                      </canvas> 
+                      {% endcomment %}
+                    </div>
+                    <div class="card-text">                      
+                      <span>Select the type of graph:</span>
+                      <select id="lineGraphhitsToggler">
+                        <option id="linegraphhitsWeekly" value="Weekly">Weekly</option>
+                        <option id="linegraphhitsYearly" value="Yearly">Yearly</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div id="graphArea">
+              <div class="row">
+                <h4 class="text-center" style="margin-top: 15px;width:100%;color:#ffab00">Monthly Bandwidth Consumption</h4>
+                <div class="card col-11 container">
+                  <canvas id="monthlyBandwidthGraph" style="background-color:white;">
+                  </canvas>
+                </div>
+              </div>
+              <div class="row">
+                <h4 class="text-center" style="margin-top: 15px;width:100%;color:#ffab00">Hourly Bandwidth Consumption</h4>
+                <div class="card col-11 container">
+                  <canvas id="hourlyBandwidthGraph" style="background-color:white;">
+                  </canvas>
+                </div>
+              </div>
+              <div class="row">
+                <h4 class="text-center" style="margin-top: 15px;width:100%;color:#ffab00">Hourly Bandwidth(Aggregate) Consumption</h4>
+                <div class="card col-11 container">
+                  <canvas id="allhour" style="background-color:white;">
+                  </canvas>
+                </div>
+              </div>
+              <div class="row">
+                <h4 class="text-center" style="margin-top: 15px;width:100%;color:#ffab00">Error Count</h4>
+                <div class="card col-11 container">
+                  <canvas id="error" style="background-color:white;">
+                  </canvas>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <h4 class="text-center" style="margin-top: 15px;width:100%;color:#ffab00">Top ten IPs consuming the highest bandwidths</h4>
+              <div id="tableArea" class="col-11  card container" style="padding:0px" >
+                <div id="highestBandwidthIpTable" style ="height:200px;overflow:auto;display:block;">
+                  <table class="table table-bordered table-striped" style="background-color:white;">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">IP Address</th>
+                        <th scope="col">Bandwidth (MB)</th>
+                      </tr>
+                    </thead>
+                    <tbody id="highestBandwidthIpTableBody">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modals -->
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="statuscodeips">
+                
+          </div>
+          <div id="statusCodeFooter" class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="unique_endpoints" tabindex="-1" role="dialog" aria-labelledby="unique_endpointsLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="unique_endpointsLabel">API Hits</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="apihitsbody">
+                
+          </div>
+          <div class="modal-footer m-0"></div>
+            <div class="mb-4 text-center">
+              <button type="button" id="apihitsprevious" class="btn btn-secondary">Previous</button>
+              <button type="button" id="apihitsnext" class="btn btn-primary">Next</button>
+            </div>
+          </div>
+      </div>
+    </div>
+  <div class="modal fade" id="auth_users" tabindex="-1" role="dialog" aria-labelledby="auth_usersLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="auth_usersLabel">Unauthorized Users</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+
+
+          <div class="modal-body" id="unauthorizedipsbody">
+                
+          </div>
+          <div class="modal-footer m-0"></div>
+            <div class="mb-4 text-center">
+              <button type="button" id="unauthorizedipsprevious" class="btn btn-secondary">Previous</button>
+              <button type="button" id="unauthorizedipsnext" class="btn btn-primary">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="auth_users2" tabindex="-1" role="dialog" aria-labelledby="auth_users2Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="auth_users2Label">Authorized Users</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="authorizedipsbody">
+                  
+            </div>
+            <div class="modal-footer m-0"></div>
+              <div class="mb-4 text-center">
+                <button type="button" id="authorizedipsprevious" class="btn btn-secondary">Previous</button>
+                <button type="button" id="authorizedipsnext" class="btn btn-primary">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    <div class="modal fade" id="botModal" tabindex="-1" role="dialog" aria-labelledby="botModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="botModalLabel">Bots</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="botips">
+
+          </div>
+          <div id="botsCodeFooter" class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modals -->
+
+
+
+    <script>
+
+document.getElementById("location").style.display="None";
+
+function locate(e){
+    if (e.keyCode == 13){
+        var ip = document.getElementById("location").value;
+            fetch("http://127.0.0.1:8000/api/findlocation/"+ip+"/")
+            .then(response=>response.json()).then(data=>{ document.getElementById("ans").innerHTML=`City: ${data.city} | Country: ${data.country} | Continent: ${data.continent}`});
+
+    }
+}
+    function find(){
+
+ if(document.getElementById("location").style.display=="none")
+  {
+    document.getElementById("location").style.display="Block";
+   }
+ else
+    document.getElementById("location").style.display="none";
+document.getElementById("ans").innerHTML = "";
+
+    }
+        // CSS Loader
+        function startLoader(){
+          let target = document.getElementById("loader");
+          let center = document.createElement("div");
+          center.setAttribute("class", "row align-items-center");
+          let div = document.createElement("div");
+          div.setAttribute("class", "col spinner-box");
+          for( let i=1; i <= 2; i++){
+            let border = document.createElement("div");
+            border.setAttribute("class", "configure-border-"+String(i));
+            let core = document.createElement("div");
+            core.setAttribute("class", "configure-core");
+            core.setAttribute("style", "background-color:#343233;");
+            border.appendChild(core)
+            div.appendChild(border);
+          }
+          center.appendChild(div);
+          target.appendChild(center);
+          var t = setTimeout(endLoader, 3000);          
+        }
+        function endLoader(){
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("pageBody").style.display = "";
+        }
+
+        function get_value(id){
+            let statuscodeinformation = {'Status': 'Each Status-Code is described below, including a description of which method(s) it can follow and any metainformation required in the response.', 'Informational': 'This class of status code indicates a provisional response, consisting only of the Status-Line and optional headers, and is terminated by an empty line. There are no required headers for this class of status code. Since HTTP/1.0 did not define any 1xx status codes, servers MUST NOT send a 1xx response to an HTTP/1.0 client except under experimental conditions.', '100': 'The client SHOULD continue with its request. This interim response is used to inform the client that the initial part of the request has been received and has not yet been rejected by the server. The client SHOULD continue by sending the remainder of the request or, if the request has already been completed, ignore this response. The server MUST send a final response after the request has been completed. See section 8.2.3 for detailed discussion of the use and handling of this status code.', '101': "The server understands and is willing to comply with the client's request, via the Upgrade message header field (section 14.42), for a change in the application protocol being used on this connection. The server will switch protocols to those defined by the response's Upgrade header field immediately after the empty line which terminates the 101 response.", 'Successful': "This class of status code indicates that the client's request was successfully received, understood, and accepted.", '200': 'The request has succeeded. The information returned with the response is dependent on the method used in the request, for example:', '201': 'The request has been fulfilled and resulted in a new resource being created. The newly created resource can be referenced by the URI(s) returned in the entity of the response, with the most specific URI for the resource given by a Location header field. The response SHOULD include an entity containing a list of resource characteristics and location(s) from which the user or user agent can choose the one most appropriate. The entity format is specified by the media type given in the Content-Type header field. The origin server MUST create the resource before returning the 201 status code. If the action cannot be carried out immediately, the server SHOULD respond with 202 (Accepted) response instead.', '202': 'The request has been accepted for processing, but the processing has not been completed. The request might or might not eventually be acted upon, as it might be disallowed when processing actually takes place. There is no facility for re-sending a status code from an asynchronous operation such as this.', '203': 'The returned metainformation in the entity-header is not the definitive set as available from the origin server, but is gathered from a local or a third-party copy. The set presented MAY be a subset or superset of the original version. For example, including local annotation information about the resource might result in a superset of the metainformation known by the origin server. Use of this response code is not required and is only appropriate when the response would otherwise be 200 (OK).', '204': 'The server has fulfilled the request but does not need to return an entity-body, and might want to return updated metainformation. The response MAY include new or updated metainformation in the form of entity-headers, which if present SHOULD be associated with the requested variant.', '205': 'The server has fulfilled the request and the user agent SHOULD reset the document view which caused the request to be sent. This response is primarily intended to allow input for actions to take place via user input, followed by a clearing of the form in which the input is given so that the user can easily initiate another input action. The response MUST NOT include an entity.', '206': 'The server has fulfilled the partial GET request for the resource. The request MUST have included a Range header field (section 14.35) indicating the desired range, and MAY have included an If-Range header field (section 14.27) to make the request conditional.', 'Redirection': 'This class of status code indicates that further action needs to be taken by the user agent in order to fulfill the request. The action required MAY be carried out by the user agent without interaction with the user if and only if the method used in the second request is GET or HEAD. A client SHOULD detect infinite redirection loops, since such loops generate network traffic for each redirection.', '300': 'The requested resource corresponds to any one of a set of representations, each with its own specific location, and agent- driven negotiation information (section 12) is being provided so that the user (or user agent) can select a preferred representation and redirect its request to that location.', '301': 'The requested resource has been assigned a new permanent URI and any future references to this resource SHOULD use one of the returned URIs. Clients with link editing capabilities ought to automatically re-link references to the Request-URI to one or more of the new references returned by the server, where possible. This response is cacheable unless indicated otherwise.', '302': 'The requested resource resides temporarily under a different URI. Since the redirection might be altered on occasion, the client SHOULD continue to use the Request-URI for future requests. This response is only cacheable if indicated by a Cache-Control or Expires header field.', '303': 'The response to the request can be found under a different URI and SHOULD be retrieved using a GET method on that resource. This method exists primarily to allow the output of a POST-activated script to redirect the user agent to a selected resource. The new URI is not a substitute reference for the originally requested resource. The 303 response MUST NOT be cached, but the response to the second (redirected) request might be cacheable.', '304': 'If the client has performed a conditional GET request and access is allowed, but the document has not been modified, the server SHOULD respond with this status code. The 304 response MUST NOT contain a message-body, and thus is always terminated by the first empty line after the header fields.', '305': 'The requested resource MUST be accessed through the proxy given by the Location field. The Location field gives the URI of the proxy. The recipient is expected to repeat this single request via the proxy. 305 responses MUST only be generated by origin servers.', '306': 'The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved.', '307': 'The requested resource resides temporarily under a different URI. Since the redirection MAY be altered on occasion, the client SHOULD continue to use the Request-URI for future requests. This response is only cacheable if indicated by a Cache-Control or Expires header field.', 'Client': 'The 4xx class of status code is intended for cases in which the client seems to have erred. Except when responding to a HEAD request, the server SHOULD include an entity containing an explanation of the error situation, and whether it is a temporary or permanent condition. These status codes are applicable to any request method. User agents SHOULD display any included entity to the user.', '400': 'The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.', '401': 'The request requires user authentication. The response MUST include a WWW-Authenticate header field (section 14.47) containing a challenge applicable to the requested resource. The client MAY repeat the request with a suitable Authorization header field (section 14.8). If the request already included Authorization credentials, then the 401 response indicates that authorization has been refused for those credentials. If the 401 response contains the same challenge as the prior response, and the user agent has already attempted authentication at least once, then the user SHOULD be presented the entity that was given in the response, since that entity might include relevant diagnostic information. HTTP access authentication is explained in "HTTP Authentication: Basic and Digest Access Authentication" [43].', '402': 'This code is reserved for future use.', '403': 'The server understood the request, but is refusing to fulfill it. Authorization will not help and the request SHOULD NOT be repeated. If the request method was not HEAD and the server wishes to make public why the request has not been fulfilled, it SHOULD describe the reason for the refusal in the entity. If the server does not wish to make this information available to the client, the status code 404 (Not Found) can be used instead.', '404': 'The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent. The 410 (Gone) status code SHOULD be used if the server knows, through some internally configurable mechanism, that an old resource is permanently unavailable and has no forwarding address. This status code is commonly used when the server does not wish to reveal exactly why the request has been refused, or when no other response is applicable.', '405': 'The method specified in the Request-Line is not allowed for the resource identified by the Request-URI. The response MUST include an Allow header containing a list of valid methods for the requested resource.', '406': 'The resource identified by the request is only capable of generating response entities which have content characteristics not acceptable according to the accept headers sent in the request.', '407': 'This code is similar to 401 (Unauthorized), but indicates that the client must first authenticate itself with the proxy. The proxy MUST return a Proxy-Authenticate header field (section 14.33) containing a challenge applicable to the proxy for the requested resource. The client MAY repeat the request with a suitable Proxy-Authorization header field (section 14.34). HTTP access authentication is explained in "HTTP Authentication: Basic and Digest Access Authentication" [43].', '408': 'The client did not produce a request within the time that the server was prepared to wait. The client MAY repeat the request without modifications at any later time.', '409': 'The request could not be completed due to a conflict with the current state of the resource. This code is only allowed in situations where it is expected that the user might be able to resolve the conflict and resubmit the request. The response body SHOULD include enough', '410': 'The requested resource is no longer available at the server and no forwarding address is known. This condition is expected to be considered permanent. Clients with link editing capabilities SHOULD delete references to the Request-URI after user approval. If the server does not know, or has no facility to determine, whether or not the condition is permanent, the status code 404 (Not Found) SHOULD be used instead. This response is cacheable unless indicated otherwise.', '411': 'The server refuses to accept the request without a defined Content- Length. The client MAY repeat the request if it adds a valid Content-Length header field containing the length of the message-body in the request message.', '412': 'The precondition given in one or more of the request-header fields evaluated to false when it was tested on the server. This response code allows the client to place preconditions on the current resource metainformation (header field data) and thus prevent the requested method from being applied to a resource other than the one intended.', '413': 'The server is refusing to process a request because the request entity is larger than the server is willing or able to process. The server MAY close the connection to prevent the client from continuing the request.', '414': 'The server is refusing to service the request because the Request-URI is longer than the server is willing to interpret. This rare condition is only likely to occur when a client has improperly converted a POST request to a GET request with long query information, when the client has descended into a URI "black hole" of redirection (e.g., a redirected URI prefix that points to a suffix of itself), or when the server is under attack by a client attempting to exploit security holes present in some servers using fixed-length buffers for reading or manipulating the Request-URI.', '415': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.', '416': 'A server SHOULD return a response with this status code if a request included a Range request-header field (section 14.35), and none of the range-specifier values in this field overlap the current extent of the selected resource, and the request did not include an If-Range request-header field. (For byte-ranges, this means that the first- byte-pos of all of the byte-range-spec values were greater than the current length of the selected resource.)', '417': 'The expectation given in an Expect request-header field (see section 14.20) could not be met by this server, or, if the server is a proxy, the server has unambiguous evidence that the request could not be met by the next-hop server.', 'Server': 'Response status codes beginning with the digit "5" indicate cases in which the server is aware that it has erred or is incapable of performing the request. Except when responding to a HEAD request, the server SHOULD include an entity containing an explanation of the error situation, and whether it is a temporary or permanent condition. User agents SHOULD display any included entity to the user. These response codes are applicable to any request method.', '500': 'The server encountered an unexpected condition which prevented it from fulfilling the request.', '501': 'The server does not support the functionality required to fulfill the request. This is the appropriate response when the server does not recognize the request method and is not capable of supporting it for any resource.', '502': 'The server, while acting as a gateway or proxy, received an invalid response from the upstream server it accessed in attempting to fulfill the request.', '503': 'The server is currently unable to handle the request due to a temporary overloading or maintenance of the server. The implication is that this is a temporary condition which will be alleviated after some delay. If known, the length of the delay MAY be indicated in a Retry-After header. If no Retry-After is given, the client SHOULD handle the response as it would for a 500 response.', '504': 'The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server specified by the URI (e.g. HTTP, FTP, LDAP) or some other auxiliary server (e.g. DNS) it needed to access in attempting to complete the request.', '505': 'The server does not support, or refuses to support, the HTTP protocol version that was used in the request message. The server is indicating that it is unable or unwilling to complete the request using the same major version as the client, as described in section 3.1, other than with this error message. The response SHOULD contain an entity describing why that version is not supported and what other protocols are supported by that server.'}
+            let statuscodeips;
+            let title = document.getElementById("exampleModalLabel");
+            while(title.firstChild){
+              title.removeChild(title.firstChild);
+            }
+            let span = document.createElement("span");
+            span.innerHTML = String(id.substring(11)) + " Response Code";
+            span.setAttribute("style", "color:red");
+            title.appendChild(span);
+            let footer = document.getElementById('statusCodeFooter');
+            try{
+              let footerStatusCodeInformation = document.getElementById("footerStatusCodeInformation");
+              footer.removeChild(footerStatusCodeInformation);
+            }
+            catch(err){
+
+            }
+            let footerStatusCodeInfo = document.createElement("span");
+            footerStatusCodeInfo.setAttribute("id", "footerStatusCodeInformation");
+            footerStatusCodeInfo.innerHTML = statuscodeinformation[String(id.substring(11))];
+            footer.appendChild(footerStatusCodeInfo);
+            fetch("http://127.0.0.1:8000/api/statuscodeips/" + String(id.substring(11)))
+            .then(function(response) {
+              return response.json();
+            })
+            .then(function(myJson) {
+              let target = document.getElementById("statuscodeips");
+              while (target.firstChild) {
+                  target.removeChild(target.firstChild);
+              }
+              statuscodeips = myJson.statuscodeips;
+              let div = document.createElement("div");
+              let span1 = document.createElement("span");
+              span1.innerHTML = "IP ADDRESS";
+              span1.setAttribute("style", "color:green;font-weight:bold;");
+              div.appendChild(span1);
+              let span2 = document.createElement("span");
+              span2.innerHTML = "COUNT";
+              span2.setAttribute("style", "color:green;font-weight:bold;");
+              span2.setAttribute("class", "float-right");
+              div.appendChild(span2);
+              target.appendChild(div);
+              target.appendChild(document.createElement("br"));
+              statuscodeips.forEach( statuscode => {
+                let div = document.createElement("div");
+                let span1 = document.createElement("span");
+                span1.innerHTML = statuscode.ip;
+                div.appendChild(span1);
+                let span2 = document.createElement("span");
+                span2.innerHTML = statuscode.count;
+                span2.setAttribute("class", "float-right");
+                div.appendChild(span2);
+                target.appendChild(div);
+              } );
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function(){         
+
+          // collabsible show
+          // $(".collapse").collapse('show');
+          //Get Error Count
+          error();
+          //bots and crawlers
+          getBots();
+          // Generate Map
+          getHeatmap();
+          // Get the statuscodehits
+          getStatuscodehits();
+          // Get the statuscodepercent
+          getStatuscodepercent();
+          // Get the apihits
+          getApihits();
+          // Get the unauthorizedips
+          getUnauthorizedips();
+          // Get the authorizedips
+          getauthorizedips();
+          // Get the HitCounts
+          getHitcounts();
+          // Get the lineGraph going
+          getLinegraphhits();
+          // Get the threat 
+          getGraphArea();
+          // Render the tables in table area
+          getTableAreaData();
+          // Dont Know Why!! ask Aakash
+          $('.date').datepicker({
+            multidate: 2,
+            format: 'dd-mm-yyyy',
+            todayHighlight:true
+          });          
+        }, false);  
+
+        // To add item to status_code_count_content
+        function getStatuscodehits(){
+          let statuscodehits;
+          let statuscodeinfo = {
+            "200": "OK The request has succeeded.",
+            "302": "Found and the requested resource resides temporarily under a different URI.",
+            "304": "Not Modified and if the client has performed a conditional GET request and access is allowed, but the document has not been modified, the server SHOULD respond with this status code.",
+            "400": "Bad Request and the request could not be understood by the server due to malformed syntax.",
+            "403": "Forbidden and the server understood the request, but is refusing to fulfill it. Authorization will not help and the request SHOULD NOT be repeated.",
+            "404": "Not Found and The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.",
+            "499": "Client closed Request (nginx specific)",
+            "500": "500 Internal Server Error as the server encountered an unexpected condition which prevented it from fulfilling the request."
+          }
+          fetch('http://127.0.0.1:8000/api/statuscodehits/')
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            statuscodehits = (myJson.statuscodehits);
+            let target = document.getElementById("status_code_count_content");
+          
+            statuscodehits.forEach(statuscode => {
+              let a = document.createElement("a");
+              a.setAttribute("id", "statuscode_"+String(statuscode.status));
+              a.setAttribute("class", "list-group-item lgi text-light");
+              a.setAttribute("style", "color:white;");
+              a.setAttribute("data-toggle", "modal");
+              a.setAttribute("data-target", "#exampleModal");
+              a.setAttribute("onclick", "get_value(this.id);")
+              a.innerHTML = statuscode.status;
+              let span = document.createElement("span");
+              span.setAttribute("class", "badge badge-light float-right");
+              span.setAttribute("data-toggle", "tooltip");
+              span.setAttribute("data-placement", "right");
+              span.setAttribute("title", statuscodeinfo[String(statuscode.status)]);
+              span.innerHTML = statuscode.hits;
+              a.appendChild(span);
+              // data-toggle="tooltip" data-placement="right" title="Tooltip on right"
+              target.appendChild(a);  
+            });
+          });
+        }
+
+       function getBots(){
+          fetch('http://127.0.0.1:8000/api/bots/')
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            const count = (myJson.count);
+
+            let botNames = document.getElementById("bots");
+
+            document.getElementById("botCount").innerHTML = count;
+            let bots = (myJson.robots);
+            let temp = new Array();
+            bots.forEach(bot => {
+              let a = document.createElement("a");
+              a.setAttribute("id", String(bot.botname));
+              a.setAttribute("class", "list-group-item lgi text-light");
+              a.setAttribute("style", "color:white;");
+              a.setAttribute("data-toggle", "modal");
+              a.setAttribute("data-target", "#botModal");
+              a.setAttribute("onclick","getBotip(this.id);");
+              if(temp.includes(bot.botname) === false){
+                a.innerHTML = bot.botname;
+                temp.push(bot.botname);
+                console.log(temp);
+                botNames.appendChild(a);
+              }
+            })
+          });
+        }
+
+        function getBotip(id){
+          let target = document.getElementById("botips");
+          let targetTitle = document.getElementById("botModalLabel");
+          target.innerHTML = "";
+          targetTitle.innerHTML = id;
+          let temp = new Array();
+          fetch('http://127.0.0.1:8000/api/bots/')
+          .then(response => response.json())
+          .then(myJson => {
+            let botslist = (myJson.robots);
+            botslist.forEach(bots => {
+              if(bots.botname === id){
+                if(temp.includes(bots.useragent) === false){
+                  let div = document.createElement("div");
+                  div.setAttribute("style", "color:green;font-weight:bold;");
+                  div.innerHTML = bots.useragent;
+                  temp.push(bots.useragent);
+                  target.appendChild(div);
+                }
+              }
+            })
+            botslist.forEach(bots => {
+              if(bots.botname === id){
+                let div = document.createElement("div");
+                div.innerHTML = bots.ip;
+                target.appendChild(div);
+              }
+            })
+          });
+
+        }
+
+        function getStatuscodepercent(){ 
+          let statuscodepercent;
+          fetch('http://localhost:8000/api/statuscodepercent/')
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            statuscodepercent = (myJson.statuscodepercent);
+            valueSuccess = parseInt(statuscodepercent['valueSuccess']);
+            valueError = parseInt(statuscodepercent['valueError']);
+            valueServerError = parseInt(statuscodepercent['valueServerError']);
+            // valueothers = parseInt(statuscodepercent.othersTotal);
+            success = (statuscodepercent.success);
+            error = (statuscodepercent.error);
+            servererror = (statuscodepercent.servererror);
+            // others = (statuscodepercent.others);
+
+            
+            var config1 = liquidFillGaugeDefaultSettings();
+            config1.circleColor = "#14A76E";
+            config1.textColor = "#14A76E";
+            config1.waveTextColor = "#52f7b2";
+            config1.waveColor = "#14A76E";
+            config1.circleThickness = 0.05;
+            config1.textVertPosition = 0.5;
+            config1.waveAnimateTime = 1000;
+            var gauge1 = loadLiquidFillGauge("fillgauge1", valueSuccess, config1);
+            
+            var config2 = liquidFillGaugeDefaultSettings();
+            config2.circleColor = "red";
+            config2.textColor = "red";
+            config2.waveTextColor = "#781818";
+            config2.waveColor = "red";
+            config2.circleThickness = 0.05;
+            config2.textVertPosition = 0.5;
+            config2.waveAnimateTime = 1000;
+            var gauge2 = loadLiquidFillGauge("fillgauge2", valueError, config2);
+
+            var config3 = liquidFillGaugeDefaultSettings();
+            config3.circleColor = "#033eff";
+            config3.textColor = "#033eff";
+            config3.waveTextColor = "#3967ff";
+            config3.waveColor = "#033eff";
+            config3.circleThickness = 0.05;
+            config3.textVertPosition = 0.5;
+            config3.waveAnimateTime = 1000;
+            var gauge3 = loadLiquidFillGauge("fillgauge3", valueServerError, config3);
+            
+            // Change the titile of the liquiddrops
+            fillgauge1 = document.getElementById("fillgauge1");
+            titledata = ""
+            success.forEach( element => {
+              titledata += "StatusCode " + String(element.status) + " - " + String(element.percent) + "%<br />";
+            } );
+            fillgauge1.setAttribute("title", String(titledata));
+
+            fillgauge2 = document.getElementById("fillgauge2");
+            titledata = ""
+            error.forEach( element => {
+              titledata += "StatusCode " + String(element.status) + " - " + String(element.percent) + "%<br />";
+            } );
+            fillgauge2.setAttribute("title", String(titledata));
+
+            fillgauge3 = document.getElementById("fillgauge3");
+            titledata = ""
+            servererror.forEach( element => {
+              titledata += "StatusCode " + String(element.status) + " - " + String(element.percent) + "%<br />";
+            } );
+            fillgauge3.setAttribute("title", String(titledata));
+
+            $(function () {
+              $('[data-toggle="tooltip"]').tooltip()
+            })
+            
+          });          
+
+        }
+
+        function getApihits(){
+          let offset = 0;
+          getApihitswithoffset(offset);
+          document.getElementById("apihitsnext").addEventListener("click", () => {
+            offset += 10;
+            getApihitswithoffset(offset);
+          });
+          document.getElementById("apihitsprevious").addEventListener("click", () => {
+            offset -= 10;
+            getApihitswithoffset(offset);
+          });
+        }
+
+        function getApihitswithoffset(offset){
+          let target = document.getElementById("apihitsbody");
+          while(target.firstChild){
+            target.removeChild(target.firstChild);
+          }
+
+          // CSS Loader
+          let center = document.createElement("div");
+          center.setAttribute("class", "row align-items-center");
+          let div = document.createElement("div");
+          div.setAttribute("class", "col spinner-box");
+          for( let i=1; i <= 2; i++){
+            let border = document.createElement("div");
+            border.setAttribute("class", "configure-border-"+String(i));
+            let core = document.createElement("div");
+            core.setAttribute("class", "configure-core");
+            border.appendChild(core)
+            div.appendChild(border);
+          }
+          center.appendChild(div);
+          target.appendChild(center);
+
+          fetch("http://localhost:8000/api/apihits/" + String(offset) + "/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            // Remove css Loader
+            while(target.firstChild){
+              target.removeChild(target.firstChild);
+            }
+
+            data = myJson.apihits;
+            data.forEach(datum => {
+              let div = document.createElement("div");
+              div.setAttribute("class", "row mb-3");
+              let span1 = document.createElement("span");
+              span1.setAttribute("class", "col-10");
+              span1.innerHTML = datum.request;
+              div.appendChild(span1);
+              let span2 = document.createElement("span");
+              span2.setAttribute("class", "col-2 text-right");
+              span2.innerHTML = datum.hits;
+              div.appendChild(span2);
+              target.appendChild(div);
+            });
+            
+          }); 
+        }
+
+        function getUnauthorizedips(){
+          let offset = 0;
+          getUnauthorizedipswithoffset(offset);
+          document.getElementById("unauthorizedipsnext").addEventListener("click", () => {
+            offset += 10;
+            getUnauthorizedipswithoffset(offset);
+          });
+          document.getElementById("unauthorizedipsprevious").addEventListener("click", () => {
+            offset -= 10;
+            getUnauthorizedipswithoffset(offset);
+          });
+        }
+
+        function getUnauthorizedipswithoffset(offset){
+          let target = document.getElementById("unauthorizedipsbody");
+          while(target.firstChild){
+            target.removeChild(target.firstChild);
+          }
+
+          // CSS Loader
+          let center = document.createElement("div");
+          center.setAttribute("class", "row align-items-center");
+          let div = document.createElement("div");
+          div.setAttribute("class", "col spinner-box");
+          for( let i=1; i <= 2; i++){
+            let border = document.createElement("div");
+            border.setAttribute("class", "configure-border-"+String(i));
+            let core = document.createElement("div");
+            core.setAttribute("class", "configure-core");
+            border.appendChild(core)
+            div.appendChild(border);
+          }
+          center.appendChild(div);
+          target.appendChild(center);
+
+          fetch("http://localhost:8000/api/unauthorizedips/" + String(offset) + "/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            // Remove css Loader
+            while(target.firstChild){
+              target.removeChild(target.firstChild);
+            }
+
+            data = myJson.unauthorizedips;
+            data.forEach(datum => {
+              let div = document.createElement("div");
+              div.setAttribute("class", "row mb-3");
+              let span1 = document.createElement("span");
+              span1.setAttribute("class", "col-10");
+              span1.innerHTML = datum.ip;
+              div.appendChild(span1);
+              let span2 = document.createElement("span");
+              span2.setAttribute("class", "col-2 text-right");
+              span2.innerHTML = datum.hits;
+              div.appendChild(span2);
+              target.appendChild(div);
+            });
+            
+          }); 
+        }
+
+        function getauthorizedips(){
+          let offset = 0;
+          getauthorizedipswithoffset(offset);
+          document.getElementById("authorizedipsnext").addEventListener("click", () => {
+            offset += 10;
+            getauthorizedipswithoffset(offset);
+          });
+          document.getElementById("authorizedipsprevious").addEventListener("click", () => {
+            offset -= 10;
+            getauthorizedipswithoffset(offset);
+          });
+        }
+
+        function getauthorizedipswithoffset(offset){
+          let target = document.getElementById("authorizedipsbody");
+          while(target.firstChild){
+            target.removeChild(target.firstChild);
+          }
+
+          // CSS Loader
+          let center = document.createElement("div");
+          center.setAttribute("class", "row align-items-center");
+          let div = document.createElement("div");
+          div.setAttribute("class", "col spinner-box");
+          for( let i=1; i <= 2; i++){
+            let border = document.createElement("div");
+            border.setAttribute("class", "configure-border-"+String(i));
+            let core = document.createElement("div");
+            core.setAttribute("class", "configure-core");
+            border.appendChild(core)
+            div.appendChild(border);
+          }
+          center.appendChild(div);
+          target.appendChild(center);
+
+          fetch("http://localhost:8000/api/authorizedips/" + String(offset) + "/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            // Remove css Loader
+            while(target.firstChild){
+              target.removeChild(target.firstChild);
+            }
+
+            data = myJson.authorizedips;
+            data.forEach(datum => {
+              let div = document.createElement("div");
+              div.setAttribute("class", "row mb-3");
+              let span1 = document.createElement("span");
+              span1.setAttribute("class", "col-10");
+              span1.innerHTML = datum.ip;
+              div.appendChild(span1);
+              let span2 = document.createElement("span");
+              span2.setAttribute("class", "col-2 text-right");
+              span2.innerHTML = datum.hits;
+              div.appendChild(span2);
+              target.appendChild(div);
+            });
+            
+          }); 
+        }
+
+        function getHitcounts(){
+          let hitcountToday = document.getElementById("hitcountToday")
+          let hitcountThisMonth = document.getElementById("hitcountThisMonth")
+          let hitcountOverall = document.getElementById("hitcountOverall")
+
+          fetch("http://localhost:8000/api/hitcounts/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            data = myJson.hitcounts;
+            hitcountToday.innerHTML = data.today;
+            hitcountThisMonth.innerHTML = data.month;
+            hitcountOverall.innerHTML = data.overall;
+          });             
+        }
+
+        function createCanvas(){
+          var lineGraphDiv = document.getElementById("lineGraphDiv");
+          while(lineGraphDiv.firstChild){
+            lineGraphDiv.removeChild(lineGraphDiv.firstChild);
+          }
+          var canvas = document.createElement("canvas");
+          canvas.setAttribute("id", "lineGraphForHits");
+          lineGraphDiv.appendChild(canvas);
+        }
+
+        function getLinegraphhits(){
+          createCanvas();
+          if(document.getElementById("lineGraphhitsToggler").value == "Yearly"){
+            getLinegraphhitsYearly();
+          }
+          else if(document.getElementById("lineGraphhitsToggler").value == "Weekly"){
+            getLinegraphhitsWeekly();
+          }
+          document.getElementById("lineGraphhitsToggler").addEventListener("change",() => {
+            createCanvas();
+            if(document.getElementById("lineGraphhitsToggler").value == "Yearly"){
+              getLinegraphhitsYearly();
+            }
+            else if(document.getElementById("lineGraphhitsToggler").value == "Weekly"){
+              getLinegraphhitsWeekly();
+            }
+          });
+        }
+
+        function getLinegraphhitsYearly(){
+          // Line chart from Chart.js
+          var ctx = document.getElementById('lineGraphForHits');
+          fetch("http://localhost:8000/api/linegraphhits/year/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            data = myJson.linegraphhits;
+            var lineChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: data
+              }
+            });
+          }); 
+        }
+
+        function getLinegraphhitsWeekly(){
+          // Line chart from Chart.js
+          var ctx = document.getElementById('lineGraphForHits');
+          fetch("http://localhost:8000/api/linegraphhits/week/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            data = myJson.linegraphhits;
+            labels = myJson.labels;
+            var lineChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: data
+              }
+            });
+          });
+        }
+
+        // Display Heat Map
+        function getHeatmap(){
+          fetch('http://127.0.0.1:8000/api/heatmaplocations/')
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            var plotdata = myJson.heatmaplocations
+            var min = 1;
+            var max = 456;
+            var data = plotdata.map(function (p) { 
+              // normalize intensity values to between 0 and 1
+              var intensity = parseInt(p['count']) || 0;
+              var normalized = (intensity - min) / (max - min);
+              return { latitude: p['latitude'], longitude: p['longitude'], count: normalized };
+            });
+
+
+            var testData = {
+              max: 8,  
+              data: data,
+            };
+            // console.log("DATA", data);
+              
+            var cfg = {
+              // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+              // if scaleRadius is false it will be the constant radius used in pixels
+              "radius": 15,
+              "maxOpacity": .5, 
+              // scales the radius based on map zoom
+              "scaleRadius": false, 
+              // if set to false the heatmap uses the global maximum for colorization
+              // if activated: uses the data maximum within the current map boundaries 
+              //   (there will always be a red spot with useLocalExtremas true)
+              "useLocalExtrema": true,
+              // which field name in your data represents the latitudeitude - default "latitude"
+              latField: 'latitude',
+              // which field name in your data represents the longitude - default "longitude"
+              lngField: 'longitude',
+              // which field name in your data represents the data value - default "value"
+              valueField: 'count',
+              blur: 0.95,
+              gradient: { 
+              '0.1': 'yellow',
+              '0.5': 'orange',
+              '0.75': 'red',
+              '1': 'blue'
+              }
+            };
+
+            var map = new L.Map('map').setView([26.3351, 17.2283], 1);
+            L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
+                {maxZoom: 100}).addTo(map); 
+
+            var heatmapLayer = new HeatmapOverlay(cfg).addTo(map);
+
+            heatmapLayer.setData(testData);
+
+              map.invalidateSize();
+            // var t = setInterval(  ()=>{
+            // } ,3000);
+          });    
+             
+        }
+        // Get the csv data and download a csv
+        function downloadStatusCodeCsv(id){
+          fetch("http://127.0.0.1:8000/api/statuscodecsv/" + String(id) +  "/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            data = myJson.statuscodecsv;
+            var finalVal = '';
+            console.log(data.length);
+            for (var i = 0; i < data.length; i++) {
+                var value = data[i];
+                
+                for (var j = 0; j < value.length; j++) {
+                    var innerValue = value[j];
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                
+                finalVal += '\n';
+            }
+
+            var pom = document.createElement('a');
+            pom.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(finalVal));
+            pom.setAttribute('download', 'statuscodedata.csv');
+            document.body.appendChild(pom);
+            pom.click();	
+          });
+        }
+        // Render the graph area        
+        function getGraphArea(){
+          fetch("http://127.0.0.1:8000/api/graphAreaData/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            let graphAreaData = myJson.graphAreaData;
+            let monthlyBandwidthGraphData = graphAreaData.monthlyBandwidthGraph;
+            let hourlyBandwidthGraphData = graphAreaData.hourlyBandwidthGraph;
+            let daily = graphAreaData.daily;
+            renderMonthlyBandwidthGraph(monthlyBandwidthGraphData);
+            renderHourlyBandwidthGraph(hourlyBandwidthGraphData);
+            renderDailyBandwidthGraph(daily);
+
+          });        
+        }
+        function renderMonthlyBandwidthGraph(data){
+          var ctx = document.getElementById("monthlyBandwidthGraph");
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ["Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+              datasets: [{
+                label: 'Monthly Bandwidth ',
+                data: data,
+                backgroundColor: [
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)',
+                'rgba(255, 171, 0, 0.2)'
+                      ],
+                borderColor: [
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)',
+                'rgba(255, 171, 0, 1)'
+                  ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+            
+              scales: {
+                xAxes: [{
+                  ticks: {
+                    maxRotation: 90,
+                    minRotation: 90
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: false
+                  }
+                }]
+              }
+            }
+          });
+        }
+        function renderHourlyBandwidthGraph(data){
+          var ctx = document.getElementById("hourlyBandwidthGraph");
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"],
+              datasets: [{
+                label: 'Hourly Bandwidth ',
+                data: data,
+                // data: [5,6,7,8,323,2,21,1,1,1,4,5,6,7,8,3,2,2,65,7,8,9,7],
+                backgroundColor: [
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)'
+                      ],
+                borderColor: [
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)'
+                  ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+            
+              scales: {
+                xAxes: [{
+                  ticks: {
+                    maxRotation: 90,
+                    minRotation: 90
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true
+                  }
+                }]
+              }
+            }
+          });
+        }
+
+
+        function renderDailyBandwidthGraph(data){
+          var ctx = document.getElementById("allhour");
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"],
+              datasets: [{
+                label: 'Hourly Bandwidth (Aggregate) ',
+                data: data,
+                // data: [5,6,7,8,323,2,21,1,1,1,4,5,6,7,8,3,2,2,65,7,8,9,7],
+                backgroundColor: [
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)'
+                      ],
+                borderColor: [
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)'
+                  ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+
+              scales: {
+                xAxes: [{
+                  ticks: {
+                    maxRotation: 90,
+                    minRotation: 90
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true
+                  }
+                }]
+              }
+            }
+          });
+        }
+
+        // Function to get and distribute the values between different tables
+        function getTableAreaData(){
+
+          fetch("http://127.0.0.1:8000/api/tableAreaData/")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            let data = myJson.tableAreaData;
+            let highestBandwidthIpTable = data.highestBandwidthIpTable;
+            renderHighestBandwidthTable(highestBandwidthIpTable);
+          });
+
+        }
+
+        function error(){
+        fetch("http://127.0.0.1:8000/api/errorgraph")
+        .then(function(response){
+           return response.json();
+        })
+        .then(function(myjson){
+        rendererrorgraph(myjson);
+        })
+        }
+        function rendererrorgraph(datas){
+          var ctx = document.getElementById("error");
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: datas.label,
+              datasets: [{
+                label: 'Error Count',
+                data: datas.count,
+                // data: [5,6,7,8,323,2,21,1,1,1,4,5,6,7,8,3,2,2,65,7,8,9,7],
+                backgroundColor: [
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)',
+                  'rgba(255, 171, 0, 0.2)'
+                      ],
+                borderColor: [
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)',
+                  'rgba(255, 171, 0, 1)'
+                  ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+
+              responsive: true,
+
+              scales: {
+                xAxes: [{
+                  ticks: {
+                  callback: function(value) {
+                    return value.substr(0, 10); //truncate
+                },
+                    maxRotation: 0,
+                    minRotation: 0
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                   }
+                }]
+              },
+              tooltips: {
+                      enabled: true,
+                      mode: 'label',
+                      callbacks: {
+                          title: function(tooltipItems, data) {
+                              var idx = tooltipItems[0].index;
+                              return 'Error_message: ' + data.labels[idx];//do something with title
+                          },
+                          count: function(tooltipItems, data) {
+                              //var idx = tooltipItems.index;
+                              //return data.labels[idx] + ' €';
+                              return tooltipItems.xLabel ;
+                          }
+                      }
+                  },
+
+
+                      }
+                    });
+                  }
+
+        function renderHighestBandwidthTable(data){
+          let tbody = document.getElementById("highestBandwidthIpTableBody");
+          let count = 1;
+          data.forEach(datum => {
+            let tr = document.createElement("tr");
+            let td0 = document.createElement("td");
+            let td1 = document.createElement("td");
+            let td2 = document.createElement("td");
+            td0.innerHTML = count;
+            td1.innerHTML = datum.ipaddress;
+            td2.innerHTML = datum.bandwidthSum;
+            tr.appendChild(td0);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tbody.appendChild(tr);  
+            count ++;
+          });
+        }
+
+    </script>
+</body>
+</html>

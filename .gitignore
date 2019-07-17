@@ -1,0 +1,5 @@
+/api/geoip2/database/GeoLite2-City.mmdb
+
+.idea
+.vscode
+req.txt

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Threats</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<style>
+        #sidebar a, a:hover, a:focus {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .navbar {
+            padding: 15px 10px;
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 40px;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-btn {
+            box-shadow: none;
+            outline: none !important;
+            border: none;
+        }
+
+        .line {
+            width: 100%;
+            height: 1px;
+            border-bottom: 1px dashed #ddd;
+            margin: 40px 0;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            perspective: 1500px;
+        }
+
+
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #7386D5;
+            color: #fff;
+            transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+            transform-origin: bottom left;
+        }
+
+        #sidebar.active {
+            margin-left: -250px;
+            transform: rotateY(100deg);
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #6d7fcc;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #47748b;
+        }
+
+        #sidebar ul p {
+            color: #fff;
+            padding: 10px;
+        }
+
+        #sidebar ul li span {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+        }
+        #sidebar ul li span:hover {
+            color: #7386D5;
+            background: #fff;
+        }
+
+        #sidebar ul li.active > span, span[aria-expanded="true"] {
+            color: #fff;
+            background: #6d7fcc;
+        }
+
+
+        #sidebar span[data-toggle="collapse"] {
+            position: relative;
+        }
+
+        #sidebar .dropdown-toggle::after {
+            display: block;
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+        }
+
+        #sidebar ul ul a {
+            font-size: 0.9em !important;
+            padding-left: 30px !important;
+            background: #6d7fcc;
+        }
+
+        #sidebar ul.CTAs {
+            padding: 20px;
+        }
+
+        #sidebar ul.CTAs a {
+            text-align: center;
+            font-size: 0.9em !important;
+            display: block;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        #sidebar a.download {
+            background: #fff;
+            color: #7386D5;
+        }
+
+        #sidebar a.article, a.article:hover {
+            background: #6d7fcc !important;
+            color: #fff !important;
+        }
+
+        #content {
+            width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        #sidebarCollapse {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        #sidebarCollapse span {
+            width: 80%;
+            height: 2px;
+            margin: 0 auto;
+            display: block;
+            background: #555;
+            transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
+            transition-delay: 0.2s;
+        }
+
+        #sidebarCollapse span:first-of-type {
+            transform: rotate(45deg) translate(2px, 2px);
+        }
+        #sidebarCollapse span:nth-of-type(2) {
+            opacity: 0;
+        }
+        #sidebarCollapse span:last-of-type {
+            transform: rotate(-45deg) translate(1px, -1px);
+        }
+
+
+        #sidebarCollapse.active span {
+            transform: none;
+            opacity: 1;
+            margin: 5px auto;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -250px;
+                transform: rotateY(90deg);
+            }
+            #sidebar.active {
+                margin-left: 0;
+                transform: none;
+            }
+            #sidebarCollapse span:first-of-type,
+            #sidebarCollapse span:nth-of-type(2),
+            #sidebarCollapse span:last-of-type {
+                transform: none;
+                opacity: 1;
+                margin: 5px auto;
+            }
+            #sidebarCollapse.active span {
+                margin: 0 auto;
+            }
+            #sidebarCollapse.active span:first-of-type {
+                transform: rotate(45deg) translate(2px, 2px);
+            }
+            #sidebarCollapse.active span:nth-of-type(2) {
+                opacity: 0;
+            }
+            #sidebarCollapse.active span:last-of-type {
+                transform: rotate(-45deg) translate(1px, -1px);
+            }
+
+        }
+        @keyframes spin {
+                from {
+                    transform: rotate(0);
+                }
+                to {
+                    transform: rotate(359deg);
+                }
+            }
+
+            @keyframes configure-clockwise {
+                0% {
+                    transform: rotate(0);
+                }
+                25% {
+                    transform: rotate(90deg);
+                }
+                50% {
+                    transform: rotate(180deg);
+                }
+                75% {
+                    transform: rotate(270deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes configure-xclockwise {
+                0% {
+                    transform: rotate(45deg);
+                }
+                25% {
+                    transform: rotate(-45deg);
+                }
+                50% {
+                    transform: rotate(-135deg);
+                }
+                75% {
+                    transform: rotate(-225deg);
+                }
+                100% {
+                    transform: rotate(-315deg);
+                }
+            }
+
+            @keyframes pulse {
+                from {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                to {
+                    opacity: 0.25;
+                    transform: scale(0.75);
+                }
+            }
+
+            .spinner-box {
+                width: 300px;
+                height: 300px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: transparent;
+            }
+
+            .configure-border-1 {
+                width: 115px;
+                height: 115px;
+                padding: 3px;
+                position: absolute;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #4f4f4c;
+                animation: configure-clockwise 3s ease-in-out 0s infinite alternate;
+            }
+
+            .configure-border-2 {
+                width: 115px;
+                height: 115px;
+                padding: 3px;
+                left: -115px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #ffab00;
+                transform: rotate(45deg);
+                animation: configure-xclockwise 3s ease-in-out 0s infinite alternate;
+            }
+
+            .configure-core {
+                width: 100%;
+                height: 100%;
+                background-color: white;
+            }
+
+            table {
+                display: flex;
+                flex-flow: column;
+                width: 100%;
+            }
+
+            thead {
+                flex: 0 0 auto;
+            }
+
+            tbody {
+                height: 400px;
+                display: block;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            tr {
+                width: 100%;
+                display: table;
+                table-layout: fixed;
+            }
+    </style>
+
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar Holder -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Threats</h3>
+            </div>
+
+            <ul id="threatsHeaders" class="list-unstyled components">
+                <!-- Thread Headers to occupy this place -->
+            </ul>
+        </nav>
+
+        <!-- Page Content Holder -->
+        <div id="content">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+                <div class="container-fluid">
+
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-align-justify"></i>
+                    </button>
+
+                    <div class="input-group-append">
+                        <a class="btn btn-outline-secondary" href="../dashboard"
+                            >Dashboard</a
+                        >
+                        <a class="btn btn-outline-secondary" href="../viewall">View All</a>
+                    </div>
+                </div>
+            </nav>
+            <div id="threatBody">
+                <div id="loader"></div>
+                <div id="threatDisplayArea">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        function startLoader() {
+            let target = document.getElementById("loader");
+            let center = document.createElement("div");
+            center.setAttribute("class", "row align-items-center");
+            let div = document.createElement("div");
+            div.setAttribute("class", "col spinner-box");
+            for (let i = 1; i <= 2; i++) {
+                let border = document.createElement("div");
+                border.setAttribute("class", "configure-border-" + String(i));
+                let core = document.createElement("div");
+                core.setAttribute("class", "configure-core");
+                border.appendChild(core);
+                div.appendChild(border);
+            }
+            center.appendChild(div);
+            target.appendChild(center);
+            // Make the sideBar active to make it hidden
+            document.getElementById("sidebar").setAttribute("class", "active");
+            document.getElementById("sidebarCollapse").setAttribute("class", "active");
+        }
+        function endLoader() {
+            document.getElementById("threatBody").removeChild(document.getElementById("loader"));
+            // Make the sideBar none to make it visible
+            document.getElementById("sidebar").setAttribute("class", "");
+            document.getElementById("sidebarCollapse").setAttribute("class", "");
+        }
+
+        // Funciton to loop through anf make  the display none for everything except the one to which the id is passed
+        function showThreat(id){
+            // Convert the id of header to id of data area
+            id = id.substring(0, id.length - 6) + "data";
+            // Hide all div
+            for(let i = 0; i < document.getElementById("threatDisplayArea").children.length; i++){
+                let currentChild = document.getElementById("threatDisplayArea").children[i];
+                currentChild.setAttribute("style", "display:none");
+            }
+            // Make the only div visible
+            document.getElementById(id).setAttribute("style", "");
+        }
+
+        function getThreats(){
+            let headers = {};
+
+            fetch("http://localhost:8000/api/threatips/")
+            .then(response => response.json())
+            .then(myJson => {
+                data = myJson.threatips;
+                
+                data.forEach(datum => {
+                    headers[String(datum.threat)] = [];
+                });
+
+                // Loop through data and append the dictionery of specific requests
+                data.forEach(datum => {
+                    headers[String(datum.threat)].push(datum);
+                });
+
+                let threatsHeaders = document.getElementById("threatsHeaders");
+                for (var key in headers){
+                    // Create navigation header in sidebar
+                    let li = document.createElement("li");
+                    let span = document.createElement("span");
+                    span.setAttribute("id", String(String(key) + "_header"));
+                    span.setAttribute("onclick", "showThreat(this.id);");
+                    let innerhtml = String(key).replace(/_/g," ").toUpperCase();
+                    span.innerHTML = innerhtml;
+                    li.appendChild(span);
+                    threatsHeaders.appendChild(li);
+
+                    // Create a div for each kind of threat
+                    let threatDisplayArea = document.getElementById("threatDisplayArea");
+                    let div = document.createElement("div");
+                    div.setAttribute("id", String(String(key) + "_data"));
+                    div.setAttribute("class", "container");
+                    div.setAttribute("style", "display:none;"); // Hide all the  divs
+                    let spanHeaderInDiv = document.createElement("span");
+                    spanHeaderInDiv.setAttribute("class", "text-center");
+                    let headerH3 = document.createElement("h3");
+                    headerH3.innerHTML = String(String(key).replace(/_/g," ").toUpperCase());
+                    spanHeaderInDiv.appendChild(headerH3);
+
+                    // Add Data Here
+                    let dataDiv = document.createElement("div");
+                    dataDiv.setAttribute("class", "row");
+                    let attackedDiv = document.createElement("div");
+                    attackedDiv.setAttribute("class", "col-6 text-center");
+                    let triedDiv = document.createElement("div");
+                    triedDiv.setAttribute("class", "col-6 text-center");
+
+                    // Header to say Attacked
+                    let attackedHeader = document.createElement("h4");
+                    attackedHeader.innerHTML = "ATTACKED";
+                    attackedDiv.appendChild(attackedHeader);
+                    attackedDiv.appendChild(document.createElement("br"));
+                    // Header to say Tried
+                    let triedHeader = document.createElement("h4");
+                    triedHeader.innerHTML = "TRIED";
+                    triedDiv.appendChild(triedHeader);
+                    triedDiv.appendChild(document.createElement("br"))
+
+                    // Create table for Attacked
+                    let attackedTable = document.createElement("table");
+                    attackedTable.setAttribute("class", "table table-striped");
+                    let thead = document.createElement("thead");
+                    let trHead = document.createElement("tr");
+                    let th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "#";
+                    trHead.appendChild(th);
+                    th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "IP Address";
+                    trHead.appendChild(th);
+                    th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "Tried Count";
+                    trHead.appendChild(th);
+                    thead.appendChild(trHead);
+                    attackedTable.appendChild(thead);
+                    
+                    // Create table for Tried
+                    let triedTable = document.createElement("table");
+                    triedTable.setAttribute("class", "table table-striped");
+                    thead = document.createElement("thead");
+                    trHead = document.createElement("tr");
+                    th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "#";
+                    trHead.appendChild(th);
+                    th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "IP Address";
+                    trHead.appendChild(th);
+                    th = document.createElement("th");
+                    th.setAttribute("scope", "col");
+                    th.innerHTML = "Tried Count";
+                    trHead.appendChild(th);
+                    thead.appendChild(trHead);
+                    triedTable.appendChild(thead);
+                    
+                    let attackedTbody = document.createElement("tbody");
+                    let triedTbody = document.createElement("tbody");
+                    // Loop through each object of the array and append the row                    
+                    let attackedRowNumber = 1;
+                    let triedRowNumber = 1;
+                    headers[key].forEach(datum => {
+                        if(datum.attacked == true){
+                            let tr = document.createElement("tr");
+                            th = document.createElement("th");
+                            th.setAttribute("scope", "row");
+                            th.innerHTML = String(attackedRowNumber++);
+                            tr.appendChild(th);
+                            let td = document.createElement("td");
+                            td.innerHTML = String(datum.ip);
+                            tr.appendChild(td);
+                            td = document.createElement("td");
+                            td.innerHTML = String(datum.count);
+                            tr.appendChild(td);
+                            attackedTbody.appendChild(tr);
+                        }
+                        else{
+                            let tr = document.createElement("tr");
+                            th = document.createElement("th");
+                            th.setAttribute("scope", "row");
+                            th.innerHTML = String(triedRowNumber++);
+                            tr.appendChild(th);
+                            let td = document.createElement("td");
+                            td.innerHTML = String(datum.ip);
+                            tr.appendChild(td);
+                            td = document.createElement("td");
+                            td.innerHTML = String(datum.count);
+                            tr.appendChild(td);
+                            triedTbody.appendChild(tr);
+                        }
+                    });
+                    attackedTable.appendChild(attackedTbody);
+                    triedTable.appendChild(triedTbody);
+
+                    attackedDiv.appendChild(attackedTable);
+                    triedDiv.appendChild(triedTable);
+                    dataDiv.appendChild(attackedDiv);
+                    dataDiv.appendChild(triedDiv);            
+
+                    div.appendChild(spanHeaderInDiv);
+                    div.appendChild(document.createElement("br"));
+                    div.appendChild(dataDiv);
+                    threatDisplayArea.appendChild(div);
+                }
+
+                // To make the first div as active
+                for (var key in headers){
+                    document.getElementById(String(String(key) + "_data")).setAttribute("style", "");
+                    break;
+                }
+
+                console.log(headers);
+
+                // Stop the CSS Loader
+                endLoader();
+            });
+        }
+
+        // Run the following functions  after the DOM has been loaded
+        document.addEventListener('DOMContentLoaded', function(){
+            // Get the values from threat api
+            getThreats();
+        });
+
+        // Start CSS Loader at the open of the page
+        startLoader();
+
+        // Collapse the sidebar    
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $(this).toggleClass('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #343233;
+    font-family: "Roboto Mono" !important;
+}
+#endpoints {
+    word-wrap: break-word;
+}
+.liquidFillGaugeText {
+    font-family: "Roboto Mono";
+    font-weight: bold;
+}
+
+.list-group-item {
+    background: #4f4f4c;
+    border-color: #fff;
+    color: #ffc31f;
+}
+.head-text {
+    background: #ffc31f;
+    border-color: #fff;
+    color: #4f4f4c;
+}
+
+.lineGraph {
+    background: #4f4f4c;
+}
+
+
+.lgi:hover {
+    cursor: pointer;
+    background: #ffc31f;
+    border-color: #fff;
+    color: #4f4f4c;
+}
+
+/* Style the lines by removing the fill and applying a stroke */
+.line {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+    fill: #ffab00;
+    /*stroke: #fff;*/
+}
+
+.focus circle {
+    fill: #fff;
+    /*stroke: steelblue;*/
+}
+
+.tick,
+line,
+.domain {
+    stroke: #fff;
+    stroke-width: 1;
+}
+
+.border-custom {
+    border-color: #fff;
+    border-width: 1px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+@keyframes configure-clockwise {
+    0% {
+        transform: rotate(0);
+    }
+    25% {
+        transform: rotate(90deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    75% {
+        transform: rotate(270deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes configure-xclockwise {
+    0% {
+        transform: rotate(45deg);
+    }
+    25% {
+        transform: rotate(-45deg);
+    }
+    50% {
+        transform: rotate(-135deg);
+    }
+    75% {
+        transform: rotate(-225deg);
+    }
+    100% {
+        transform: rotate(-315deg);
+    }
+}
+
+@keyframes pulse {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0.25;
+        transform: scale(0.75);
+    }
+}
+
+.spinner-box {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+.configure-border-1 {
+    width: 115px;
+    height: 115px;
+    padding: 3px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #4f4f4c;
+    animation: configure-clockwise 3s ease-in-out 0s infinite alternate;
+}
+
+.configure-border-2 {
+    width: 115px;
+    height: 115px;
+    padding: 3px;
+    left: -115px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffab00;
+    transform: rotate(45deg);
+    animation: configure-xclockwise 3s ease-in-out 0s infinite alternate;
+}
+
+.configure-core {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+div.scrollmenu {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+div.scrollmenu a:hover {
+    background-color: #777;
+}
+
+/* MAp */
+#map {
+    width: 100%;
+    height: 275px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}

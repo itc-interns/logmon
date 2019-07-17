@@ -1,0 +1,19 @@
+body{
+    font-family: 'Roboto Mono', monospace !important;
+	width: 100%;
+	height: 100%;
+	background-color: #272727;
+}
+#endpoints{
+
+	word-wrap:break-word;
+}
+
+input, optgroup, select, textarea {
+    font-family: "Roboto Mono" !important;
+}
+
+.toast{
+    background-color:red;
+}
+
