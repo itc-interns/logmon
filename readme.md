@@ -42,12 +42,12 @@ If you already done that, go to
 
 ![alt text][dashboard1]
 
-You can downlolad the CSV files for Success, Error and Server Errors by clicking the gauges.
+You can download the CSV files for Success, Client Errors and Server Errors by clicking the respective gauges.
 
 ![alt text][dashboard16]
 
-You can see the IP address heat map, According to the count the heat is shown.
-You can search any IP using the search option in the heat map.
+You can see the IP address heat map, generated on the basis of the access location.
+You can search any IP using the search option provided in the heat map.
 
 ![alt text][dashboard15]
 
@@ -55,7 +55,7 @@ In Hits based graph, You can see the yearly and weekly hits counts of each statu
 
 ![alt text][dashboard17]
 
-These are the different bar charts showing monthly and hourly bandwidth consumption.
+These are the  bar charts showing monthly and hourly bandwidth consumption.
 
 ![alt text][dashboard3]
 ![alt text][dashboard4]
