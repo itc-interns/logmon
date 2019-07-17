@@ -8,11 +8,7 @@ Using pip to install Pipenv and its dependencies,
 
     pip install pipenv
 
-Create a virtual environment by,
-
-    pipenv shell
-
-Then replace the pipfile with given pipfile and install the dependencies,
+Create a virtual environment and install the dependencies with the given pipfile,
 
     pipenv install
 
@@ -46,12 +42,12 @@ If you already done that, go to
 
 ![alt text][dashboard1]
 
-You can download the CSV files for Success, Error and Server Errors by clicking the respective gauges.
+You can downlolad the CSV files for Success, Error and Server Errors by clicking the gauges.
 
 ![alt text][dashboard16]
 
-You can see the IP address heat map, on the basis of access count.
-You can search the location of any IP using the search option provided along with the heat map.
+You can see the IP address heat map, According to the count the heat is shown.
+You can search any IP using the search option in the heat map.
 
 ![alt text][dashboard15]
 
@@ -59,7 +55,7 @@ In Hits based graph, You can see the yearly and weekly hits counts of each statu
 
 ![alt text][dashboard17]
 
-These are the  bar charts showing monthly and hourly bandwidth consumption.
+These are the different bar charts showing monthly and hourly bandwidth consumption.
 
 ![alt text][dashboard3]
 ![alt text][dashboard4]
@@ -67,7 +63,7 @@ These are the  bar charts showing monthly and hourly bandwidth consumption.
 
 A Chart is showing the error counts.
 
-The table below lists the top 10 IPs that consumed high amount of bandwidth.
+The table below is listing the top 10 IP that consumed high amount of bandwidths.
 
 ![alt text][dashboard7]
 
