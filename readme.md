@@ -18,7 +18,7 @@ After the installation go ahead and run this command to run the server,
 
 or,
 
-    python manage.py runserver [PORT]
+    python manage.py runserver [IP_ADDRESS]:[PORT]
 
 ___
 
