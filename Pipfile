@@ -16,7 +16,7 @@ django = "*"
 psycopg2 = "==2.7.7"
 geoip2 = "*"
 python-decouple = "*"
-django-cors-headers==3.0.2
+django-cors-headers = "==3.0.2"
 
 [requires]
 python_version = "3.6"
