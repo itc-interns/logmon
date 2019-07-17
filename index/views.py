@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from dashboard.models import LogsHolder,error_logs
+from dashboard.models import LogsHolder, error_logs
 from .models import daily_bandwidth
 import pandas as pd
 import re
@@ -9,13 +9,15 @@ import shutil
 import os
 import time
 from datetime import datetime
+from time import strptime
+
 
 # Create your views here.
 def index(request):
     flag = 0
     if request.method == 'POST':
         request.session['source'] = request.POST.get('source')
-        source =request.POST.get('source')
+        source = request.POST.get('source')
         print(request.session.get('source'))
         if os.path.exists(str(request.session.get('source'))):
             flag = 0
@@ -40,63 +42,65 @@ def index(request):
             regex = ''.join(
                 '(?P<' + g + '>.*?)' if g else re.escape(c)
                 for g, c in re.findall(r'\$(\w+)|(.)', conf))
-                
+
             files = glob.iglob(os.path.join(source_dir, "access.log.*.gz.log"))
 
             for filepath in files:
 
                 raw_data = open(filepath, "r", encoding="utf8")
                 authorizedusers = []
-                
+
                 for idx, i in enumerate(raw_data):
                     m = re.match(regex, i)
 
-                    #Find the authorized users
+                    # Find the authorized users
                     authorized = re.findall('(.*\d) - - .*POST.*200 \d{1,}', i)
                     if len(authorized):
                         authorizedip = str(authorized[0])
                         if authorizedip not in authorizedusers:
                             authorizedusers.append(authorizedip)
-                
-                # Temp Area
-                
-                # print(authorizedusers)
-                # temp = LogsHolder.objects.filter(authorizedUser = True).distinct()
-                # for i in temp:
-                #     if i.remoteAddr in authorizedusers:
-                #         print("True")
 
-                # Temp Area
+                    # Temp Area
+
+                    # print(authorizedusers)
+                    # temp = LogsHolder.objects.filter(authorizedUser = True).distinct()
+                    # for i in temp:
+                    #     if i.remoteAddr in authorizedusers:
+                    #         print("True")
+
+                    # Temp Area
 
                     payload = m.groupdict()
                     # 'daily bandwidth
 
-
-
                     print(hourly)
                     data = LogsHolder()
                     data.remoteAddr = payload['remote_addr']
-                    data.remoteUser = payload['remote_user']   
-                    
+                    data.remoteUser = payload['remote_user']
+
                     # Convert time in logformat to time in python datetime format and store it in db
                     timeLocalstr = str(payload['time_local'])
                     timeLocal = datetime.strptime(timeLocalstr, '%d/%b/%Y:%H:%M:%S %z')
-                    timeLocal = timeLocal.replace(tzinfo = None)
-                    data.timeLocal = timeLocal        
+                    timeLocal = timeLocal.replace(tzinfo=None)
+                    data.timeLocal = timeLocal
 
                     data.request = payload['request']
                     data.status = payload['status']
                     data.bodyBytesSent = payload['body_bytes_sent']
                     data.httpReferer = payload['http_referer']
                     data.httpUserAgent = payload['http_user_agent']
-                    
+
                     # Check and add the authorized column value
                     if str(payload['remote_addr']) in authorizedusers:
                         data.authorizedUser = True
                     else:
                         data.authorizedUser = False
-                    
-                    if(LogsHolder.objects.filter(remoteAddr = payload['remote_addr'], remoteUser = payload['remote_user'], timeLocal = timeLocal, request = payload['request'], status = payload['status'], bodyBytesSent = payload['body_bytes_sent'], httpReferer = payload['http_referer'], httpUserAgent = payload['http_user_agent']).count() == 0):
+
+                    if (LogsHolder.objects.filter(remoteAddr=payload['remote_addr'], remoteUser=payload['remote_user'],
+                                                  timeLocal=timeLocal, request=payload['request'],
+                                                  status=payload['status'], bodyBytesSent=payload['body_bytes_sent'],
+                                                  httpReferer=payload['http_referer'],
+                                                  httpUserAgent=payload['http_user_agent']).count() == 0):
                         data.save()
                         tangent = 1
                         hourly[payload['time_local'].split(":")[1]] += int(payload['body_bytes_sent'])
@@ -116,7 +120,7 @@ def index(request):
                     m = re.match(regex, i)
                     errorlog = m.groupdict()
                     data = error_logs()
-                    data.date = errorlog['date'].replace('/','-')
+                    data.date = errorlog['date'].replace('/', '-')
                     data.time = errorlog['time']
                     data.level = errorlog['level']
                     data.pid = errorlog['pid']
@@ -126,11 +130,10 @@ def index(request):
                         data.client = errorlog['message'].split(",")[1].split(":")[1].strip()
                         data.request = errorlog['message'].split(",")[3].split(":")[1].strip()
                     except:
-                        data.message =errorlog['message']
+                        data.message = errorlog['message']
                         data.client = "-"
                         data.request = "-"
                     data.save()
-
 
                 if tangent:
                     if daily_bandwidth.objects.all().count() == 0:
@@ -151,6 +154,29 @@ def index(request):
                             data.day = k
                             data.bandwidth = v
                             data.save()
+            with open("E:\\Server\\Logs\\nginx\\catalina.log") as cat:
+                for line in cat:
+                    line = line.strip()
+                    try:
+                        m = re.match(r'^(\d+\-\S+\-\d{4})\s(\d+\:\d+\:\d+\.\d{3})\s(\S+)\s(\[\S+\])\s(\S+)\s(.*)', line,
+                                     re.I)
+                        data = error_logs()
+
+                        z = m[1].replace(m[1].split("-")[1], str(strptime(m[1].split("-")[1], '%b').tm_mon))
+                        format_str = '%d-%m-%Y'
+                        datetime_obj = datetime.strptime(z, format_str)
+                        data.date = datetime_obj
+                        data.time = m[2]
+                        data.level = m[3]
+
+                        data.tid = m[4]
+                        data.client = m[5]
+                        data.message = m[6]
+                        data.pid = '-'
+                        data.request = "-"
+                        data.save()
+                    except:
+                        print("NONE CATALIAN")
             print("----%s seconds ----" % (time.time() - start_time))
             return redirect('dashboard')
         else:
